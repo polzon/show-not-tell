@@ -1,0 +1,101 @@
+class_name StateMachine
+extends Node
+
+## Emits after [signal state_end] when the previous state
+## is finished.
+##
+## TODO: Refactor to state_ready
+signal state_start(started_state: State)
+
+## Emits before [signal state_start] when the previous state
+## is finished.
+##
+## TODO: Refactor to state_exit
+signal state_end(end_state: State)
+
+## Current [State] the actor is in.
+@onready var state: State:
+	set(v):
+		if state:
+			state._on_state_end()
+			state_end.emit(state)
+		state = v
+		v._on_state_start()
+		state_start.emit(v)
+
+## The previous [Action] that was called through [method handle_action].
+@onready var current_action: Action
+
+## [Actor] that the state_machine is managing.
+@onready var actor: Actor:
+	set(v):
+		if v:
+			for node in v.get_children():
+				if node is State:
+					(node as State).actor = v
+			actor = v
+		assert(actor, "StateMachine failed to set actor!")
+	get():
+		if not actor:
+			actor = get_parent() as Actor
+		assert(actor, "StateMachine failed find an actor!")
+		return actor
+
+
+func _init() -> void:
+	name = "StateMachine"
+
+
+func _ready() -> void:
+	assert(actor, "State machine exists without an actor!")
+
+
+## Finds the state as a [GDScript], assuming it's already a node that
+## exists under this StateMachine node. It allows for clean syntax,
+## like get_state(StateMove).
+func get_state(state_type: GDScript) -> State:
+	for node: State in get_children():
+		assert(node is State, "Child of StateMachine is not a State!")
+		if is_instance_of(node, state_type):
+			return node
+	printerr("Couldn't find State: ", state_type.get_global_name())
+	return null
+
+
+## Updates the current [State], and no other state. If wanting to
+## update all the time independently of this, use _process() or
+## something like that.
+func update_state(delta: float) -> void:
+	state._update_state(delta)
+
+
+## Passes the [Action] to the current [State], as well as sets
+## [member current_action] to the submitted action.
+func handle_action(action: Action) -> void:
+	if not action.actor:
+		action.actor = actor
+	current_action = action
+	assert(state, "No default state found!")
+	state._handle_action(action)
+
+
+## Interrupts and immediately changes the current [State].
+## If wanting to wait for the state to finish instead, use [method queue_state].
+func change_state(new_state: GDScript) -> void:
+	var state_node := get_state(new_state)
+	if state_node:
+		state = state_node
+
+
+## Similar to [method change_state], but waits for the current [State]
+## to finish before changing.
+func queue_state(new_state: GDScript) -> void:
+	## TODO: Implement lol.
+	change_state(new_state)
+
+
+## TODO: Implement being able to freeze the current running [State] node.
+## Perhaps should just freeze the process. The parent actor should
+## be unaffected.
+func pause_state() -> void:
+	pass
