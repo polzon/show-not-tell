@@ -3,14 +3,10 @@ extends Node
 
 ## Emits after [signal state_end] when the previous state
 ## is finished.
-##
-## TODO: Refactor to state_ready
 signal state_start(started_state: State)
 
 ## Emits before [signal state_start] when the previous state
 ## is finished.
-##
-## TODO: Refactor to state_exit
 signal state_end(end_state: State)
 
 ## Current [State] the actor is in.
@@ -62,11 +58,12 @@ func get_state(state_type: GDScript) -> State:
 	return null
 
 
-## Updates the current [State], and no other state. If wanting to
-## update all the time independently of this, use _process() or
-## something like that.
-func update_state(delta: float) -> void:
-	state._update_state(delta)
+func _process(delta: float) -> void:
+	state._tick(delta)
+
+
+func _physics_process(delta: float) -> void:
+	state._physics_tick(delta)
 
 
 ## Passes the [Action] to the current [State], as well as sets

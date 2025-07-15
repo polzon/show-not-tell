@@ -2,12 +2,11 @@ class_name State
 extends Node
 ## Base class for Actor States.
 ## [br]
-## TODO: Decouple this away from my actor system.
+## [b]TODO:[/b] Decouple this away from my actor system.
+## @experimental: When the inspector plugin progresses, I plan on moving this
+## away from extending a node, and instead being a resource.
 
-signal state_start
-
-signal state_end
-
+## The [Actor] that the state is affecting.
 @onready var actor: Actor:
 	get():
 		if not actor:
@@ -16,6 +15,7 @@ signal state_end
 		assert(actor, "State failed to set actor!")
 		return actor
 
+## The [StateMachine] that is handling the [State].
 @onready var state_machine: StateMachine:
 	get():
 		if not state_machine:
@@ -23,6 +23,7 @@ signal state_end
 		assert(state_machine, "Failed to get StateMachine!")
 		return state_machine
 
+## The [AnimationTree] paired with the [Actor]. Also see: [member actor].
 @onready var anim_tree: AnimationTree:
 	get():
 		assert(actor, "Trying to get anim_tree, but no actor is assigned.")
@@ -32,6 +33,8 @@ signal state_end
 	set(v):
 		return
 
+## The [AnimationNodeStateMachinePlayback] (what a mouthful!) that is paired
+## with [member anim_tree] and [member actor].
 @onready var anim_playback: AnimationNodeStateMachinePlayback:
 	get():
 		if anim_tree:
@@ -50,62 +53,40 @@ func _handle_action(_action: Action) -> void:
 
 
 func _on_state_start() -> void:
-	state_start.emit()
-
-
-func _on_state_end() -> void:
-	state_end.emit()
-
-
-## Method that is called from [StateMachine] and is only updated
-## when the [State] is the current state.
-func _update_state(_delta: float) -> void:
 	pass
 
 
+func _on_state_end() -> void:
+	pass
+
+
+## Similar to [member _physics_update], but only runs when the state is
+## the current state.
+func _physics_tick(_delta: float) -> void:
+	pass
+
+
+## Similar to [member _process], but only runs when the state is
+##  the current state.
+func _tick(_delta: float) -> void:
+	pass
+
+
+## Returns the active [State] the [StateMachine] is processing.
 func current_state() -> State:
 	return state_machine.state if state_machine else null
 
 
+## Returns a [bool] if this state is the current state being processed by the
+## [StateMachine].
 func is_current_state() -> bool:
 	return current_state() == self
 
 
+## Request the [StateMachine] to change to [parameter new_state]. This parameter
+## takes a [GDScript] object, assuming it's a script that inherets [State],
+## otherwise it returns an error.
 func change_state(new_state: GDScript) -> void:
 	var state := state_machine.get_state(new_state)
 	if actor and state:
 		state_machine.state = state
-
-
-## Temp debug function to draw a tile rect at the mouse position.
-func _debug_show_mouse_tile() -> void:
-	var mouse_global_pos := actor.get_global_mouse_position()
-	var mouse_tile_pos := DebugGrid.global_pos_to_tile_coord(mouse_global_pos)
-	var mouse_tile_rect := DebugGrid.get_tile_rect(mouse_tile_pos)
-
-	var does_intersect := mouse_tile_rect.intersects(Rect2(
-			mouse_global_pos.x,
-			mouse_global_pos.y,
-			0,
-			0))
-
-	DebugUtil.draw_debug_line(actor.position, mouse_global_pos)
-	DebugUtil.draw_debug_rect(mouse_tile_rect)
-	DebugUtil.draw_debug_circle(
-			mouse_global_pos,
-			2.0,
-			Color.GREEN if does_intersect else Color.RED)
-	_debug_draw_selected_actor(actor)
-
-
-## Temp debug function to draw a bounding box around an actor.
-static func _debug_draw_selected_actor(target: Actor) -> void:
-	var _mouse_global_pos := target.get_global_mouse_position()
-
-	var col := target.find_child("CollisionShape2D") as CollisionShape2D
-	if not col:
-		return
-
-	var col_bounds := col.shape.get_rect()
-	col_bounds.position += target.position
-	DebugUtil.draw_debug_rect(col_bounds)
