@@ -1,4 +1,4 @@
-[gd_scene load_steps=0 format=3 uid="uid://6n7e8d62o8a6"]
+[gd_scene format=3 uid="uid://6n7e8d62o8a6"]
 
 [node name="BehaviorGridmap" type="Control"]
 layout_mode = 3
