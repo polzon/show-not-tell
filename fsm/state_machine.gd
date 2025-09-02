@@ -24,18 +24,19 @@ signal state_end(end_state: State)
 
 ## [Actor] that the state_machine is managing.
 @onready var actor: Actor:
-	set(v):
-		if v:
-			for node in v.get_children():
-				if node is State:
-					(node as State).actor = v
-			actor = v
-		assert(actor, "StateMachine failed to set actor!")
 	get():
-		if not actor:
+		if not is_instance_valid(actor):
 			actor = get_parent() as Actor
 		assert(actor, "StateMachine failed find an actor!")
 		return actor
+	set(v):
+		if v:
+			actor = v
+			for node: Node in actor.get_children():
+				var state: State = node as State
+				if is_instance_valid(state) and is_instance_valid(state.actor):
+					state.actor = actor
+		assert(actor, "StateMachine failed to set actor!")
 
 
 func _init() -> void:
@@ -69,18 +70,18 @@ func _physics_process(delta: float) -> void:
 ## Passes the [Action] to the current [State], as well as sets
 ## [member current_action] to the submitted action.
 func handle_action(action: Action) -> void:
-	if not action.actor:
+	if not is_instance_valid(action.actor):
 		action.actor = actor
 	current_action = action
-	assert(state, "No default state found!")
-	state._handle_action(action)
+	if is_instance_valid(state):
+		state._handle_action(action)
 
 
 ## Interrupts and immediately changes the current [State].
 ## If wanting to wait for the state to finish instead, use [method queue_state].
 func change_state(new_state: GDScript) -> void:
-	var state_node := get_state(new_state)
-	if state_node:
+	var state_node: State = get_state(new_state)
+	if is_instance_valid(state_node):
 		state = state_node
 
 
