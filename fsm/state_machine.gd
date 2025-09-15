@@ -10,9 +10,9 @@ signal state_start(started_state: State)
 signal state_end(end_state: State)
 
 ## Current [State] the actor is in.
-@onready var state: State:
+var state: State:
 	set(v):
-		if state:
+		if is_instance_valid(state):
 			state._on_state_end()
 			state_end.emit(state)
 		state = v
@@ -20,66 +20,52 @@ signal state_end(end_state: State)
 		state_start.emit(v)
 
 ## The previous [Action] that was called through [method handle_action].
-@onready var current_action: Action
-
-## [Actor] that the state_machine is managing.
-@onready var actor: Actor:
-	get():
-		if not is_instance_valid(actor):
-			actor = get_parent() as Actor
-		assert(actor, "StateMachine failed find an actor!")
-		return actor
-	set(v):
-		if v:
-			actor = v
-			for node: Node in actor.get_children():
-				var state: State = node as State
-				if is_instance_valid(state) and is_instance_valid(state.actor):
-					state.actor = actor
-		assert(actor, "StateMachine failed to set actor!")
-
-
-func _init() -> void:
-	name = "StateMachine"
-
-
-func _ready() -> void:
-	assert(actor, "State machine exists without an actor!")
+var current_action: Action
 
 
 ## Finds the state as a [GDScript], assuming it's already a node that
 ## exists under this StateMachine node. It allows for clean syntax,
 ## like get_state(StateMove).
 func get_state(state_type: GDScript) -> State:
-	for node: State in get_children():
-		assert(node is State, "Child of StateMachine is not a State!")
-		if is_instance_of(node, state_type):
-			return node
+	for node: Node in get_children():
+		var state_node := node as State
+		assert(state_node, "Child of StateMachine is not a State!")
+		if is_instance_of(state_node, state_type) \
+				and is_instance_valid(state_node):
+			return state_node
+
 	printerr("Couldn't find State: ", state_type.get_global_name())
 	return null
 
 
 func _process(delta: float) -> void:
-	state._tick(delta)
+	assert(state)
+	if is_instance_valid(state):
+		state._tick(delta)
 
 
 func _physics_process(delta: float) -> void:
-	state._physics_tick(delta)
+	assert(state)
+	if is_instance_valid(state):
+		state._physics_tick(delta)
 
 
 ## Passes the [Action] to the current [State], as well as sets
 ## [member current_action] to the submitted action.
-func handle_action(action: Action) -> void:
-	if not is_instance_valid(action.actor):
-		action.actor = actor
+func _action_process(action: Action) -> void:
 	current_action = action
 	if is_instance_valid(state):
 		state._handle_action(action)
 
 
+func handle_action(action: Action) -> void:
+	_action_process(action)
+
+
 ## Interrupts and immediately changes the current [State].
 ## If wanting to wait for the state to finish instead, use [method queue_state].
 func change_state(new_state: GDScript) -> void:
+	assert(new_state)
 	var state_node: State = get_state(new_state)
 	if is_instance_valid(state_node):
 		state = state_node
