@@ -1,3 +1,4 @@
+@abstract
 class_name State
 extends Node
 ## Abstract base class for States.
@@ -9,7 +10,7 @@ extends Node
 ## The [StateMachine] that is handling the [State].
 @onready var state_machine: StateMachine:
 	get():
-		if not state_machine:
+		if not is_instance_valid(state_machine):
 			state_machine = get_parent() as StateMachine
 		assert(state_machine, "Failed to get StateMachine!")
 		return state_machine
@@ -20,13 +21,12 @@ extends Node
 func _handle_action(_action: Action) -> void:
 	pass
 
+@abstract
+func _on_state_start() -> void
 
-func _on_state_start() -> void:
-	pass
 
-
-func _on_state_end() -> void:
-	pass
+@abstract
+func _on_state_end() -> void
 
 
 ## Similar to [member _physics_update], but only runs when the state is

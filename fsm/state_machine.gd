@@ -69,17 +69,3 @@ func change_state(new_state: GDScript) -> void:
 	var state_node: State = get_state(new_state)
 	if is_instance_valid(state_node):
 		state = state_node
-
-
-## Similar to [method change_state], but waits for the current [State]
-## to finish before changing.
-func queue_state(new_state: GDScript) -> void:
-	## TODO: Implement lol.
-	change_state(new_state)
-
-
-## TODO: Implement being able to freeze the current running [State] node.
-## Perhaps should just freeze the process. The parent actor should
-## be unaffected.
-func pause_state() -> void:
-	pass
