@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://6n7e8d62o8a6"]
 
-[node name="BehaviorGridmap" type="Control"]
+[node name="BehaviorGridmap" type="Control" unique_id=50462008]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,7 +10,7 @@ grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 metadata/_edit_lock_ = true
 
-[node name="HSplitContainer" type="HSplitContainer" parent="."]
+[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=1463529464]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,32 +19,32 @@ grow_horizontal = 2
 grow_vertical = 2
 dragger_visibility = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer" unique_id=150786792]
 layout_mode = 2
 
-[node name="FileButtons" type="HBoxContainer" parent="HSplitContainer/VBoxContainer"]
+[node name="FileButtons" type="HBoxContainer" parent="HSplitContainer/VBoxContainer" unique_id=1904561312]
 layout_mode = 2
 
-[node name="FileButton" type="Button" parent="HSplitContainer/VBoxContainer/FileButtons"]
+[node name="FileButton" type="Button" parent="HSplitContainer/VBoxContainer/FileButtons" unique_id=710552747]
 layout_mode = 2
 text = "File"
 flat = true
 
-[node name="AnotherButton" type="Button" parent="HSplitContainer/VBoxContainer/FileButtons"]
+[node name="AnotherButton" type="Button" parent="HSplitContainer/VBoxContainer/FileButtons" unique_id=1614594364]
 layout_mode = 2
 text = "Another Button"
 flat = true
 
-[node name="SearchField" type="LineEdit" parent="HSplitContainer/VBoxContainer"]
+[node name="SearchField" type="LineEdit" parent="HSplitContainer/VBoxContainer" unique_id=564584984]
 layout_mode = 2
 placeholder_text = "Search"
 
-[node name="FileTree" type="Tree" parent="HSplitContainer/VBoxContainer"]
+[node name="FileTree" type="Tree" parent="HSplitContainer/VBoxContainer" unique_id=1965411569]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BehaviorGraph" type="GraphEdit" parent="HSplitContainer"]
+[node name="BehaviorGraph" type="GraphEdit" parent="HSplitContainer" unique_id=1028277202]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -53,15 +53,15 @@ panning_scheme = 1
 right_disconnects = true
 show_zoom_label = true
 
-[node name="GraphNode" type="GraphNode" parent="HSplitContainer/BehaviorGraph"]
+[node name="GraphNode" type="GraphNode" parent="HSplitContainer/BehaviorGraph" unique_id=714814754]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.271875
 anchor_top = 0.41875
 anchor_right = 0.73541665
 anchor_bottom = 0.5875
-offset_left = 71.23125
-offset_right = 155.23132
+offset_left = 125.0625
+offset_right = 209.06256
 offset_bottom = 66.0
 mouse_filter = 1
 position_offset = Vector2(261, 268)
