@@ -6,8 +6,9 @@ extends EditorPlugin
 static var gridmap_dock: Control:
 	get():
 		if not gridmap_dock:
-			gridmap_dock = preload(
-					BehaviorGraph.GRAPH_TSCN_UID).instantiate()
+			var behavior_graph := preload(BehaviorGraph.GRAPH_TSCN_UID)
+			if behavior_graph and behavior_graph.can_instantiate():
+				gridmap_dock = behavior_graph.instantiate()
 		return gridmap_dock
 
 ## Name that will show up inside the editor.
