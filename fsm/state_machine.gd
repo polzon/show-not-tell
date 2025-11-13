@@ -29,9 +29,9 @@ var current_action: Action
 func get_state(state_type: GDScript) -> State:
 	for node: Node in get_children():
 		var state_node := node as State
-		assert(state_node, "Child of StateMachine is not a State!")
-		if is_instance_of(state_node, state_type) \
-				and is_instance_valid(state_node):
+		assert(state_node, "Passed gdscript is not a State object!")
+		if state_node \
+				and is_instance_of(state_node, state_type):
 			return state_node
 
 	printerr("Couldn't find State: ", state_type.get_global_name())
@@ -39,13 +39,15 @@ func get_state(state_type: GDScript) -> State:
 
 
 func _process(delta: float) -> void:
-	assert(state)
+	if Engine.is_editor_hint():
+		set_process(false)
 	if is_instance_valid(state):
 		state._tick(delta)
 
 
 func _physics_process(delta: float) -> void:
-	assert(state)
+	if Engine.is_editor_hint():
+		set_physics_process(false)
 	if is_instance_valid(state):
 		state._physics_tick(delta)
 
@@ -65,7 +67,6 @@ func handle_action(action: Action) -> void:
 ## Interrupts and immediately changes the current [State].
 ## If wanting to wait for the state to finish instead, use [method queue_state].
 func change_state(new_state: GDScript) -> void:
-	assert(new_state)
-	var state_node: State = get_state(new_state)
-	if is_instance_valid(state_node):
+	var state_node := get_state(new_state)
+	if state_node:
 		state = state_node
