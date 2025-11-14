@@ -1,5 +1,6 @@
 class_name StateMachine
-extends Node
+extends BehaviorControl
+## Implemntation of a Finite State Machine.
 
 ## Emits after [signal state_end] when the previous state
 ## is finished.
